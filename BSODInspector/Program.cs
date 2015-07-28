@@ -45,6 +45,7 @@ namespace BSODInspector
             }
             else
             {
+                Directory.CreateDirectory(tempDirectory);
                 DirectoryInfo dInfo = new DirectoryInfo(tempDirectory);
                 DirectorySecurity dSecurity = dInfo.GetAccessControl();
                 dSecurity.AddAccessRule(new FileSystemAccessRule(
@@ -52,7 +53,7 @@ namespace BSODInspector
                     InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit,
                     PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
                 dInfo.SetAccessControl(dSecurity);
-                Directory.CreateDirectory(tempDirectory);
+                
             }
 
 

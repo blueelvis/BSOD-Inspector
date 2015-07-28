@@ -1,0 +1,6 @@
+C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2013\Projects\BSODInspector\BSODInspector\bin\x86\Debug\BSODInspector.exe.config
+C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2013\Projects\BSODInspector\BSODInspector\bin\x86\Debug\BSODInspector.exe
+C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2013\Projects\BSODInspector\BSODInspector\bin\x86\Debug\BSODInspector.pdb
+C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2013\Projects\BSODInspector\BSODInspector\obj\x86\Debug\BSODInspector.csprojResolveAssemblyReference.cache
+C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2013\Projects\BSODInspector\BSODInspector\obj\x86\Debug\BSODInspector.exe
+C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2013\Projects\BSODInspector\BSODInspector\obj\x86\Debug\BSODInspector.pdb

@@ -9,3 +9,4 @@ C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2015\Projects\BSODInspector\BSO
 C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2015\Projects\BSODInspector\BSODInspector\obj\Release\BSODInspector.pdb
 C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2015\Projects\BSODInspector\BSODInspector\bin\Release\BSODInspector.exe
 C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2015\Projects\BSODInspector\BSODInspector\bin\Release\BSODInspector.pdb
+C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2015\Projects\BSODInspector\BSODInspector\obj\Release\BSODInspector.csprojResolveAssemblyReference.cache

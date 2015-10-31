@@ -19,8 +19,9 @@ namespace BSODInspector
             Console.WriteLine("####################################");
             Console.WriteLine("BSOD Inspector");
             Console.WriteLine("####################################");
-            Console.WriteLine("\nCreated By - blueelvis");
-            Console.WriteLine("Special Thanks - John D. Carrona (Microsoft MVP) \n\n");
+            Console.WriteLine(Environment.NewLine + "Created By - blueelvis");
+            Console.WriteLine("Special Thanks - John D. Carrona (Microsoft MVP)" + Environment.NewLine +
+                              Environment.NewLine);
             string zipFileName = Environment.MachineName + "_" + DateTime.Now.ToString("G") + ".zip";
             zipFileName =
                 zipFileName.Replace(" ", "_")
@@ -139,7 +140,8 @@ namespace BSODInspector
             }
 
             // ==================================================================================
-            Console.WriteLine(DateTime.Now.ToString("G") + "\t - Generating the DXDIAG Report\n\n");
+            Console.WriteLine(DateTime.Now.ToString("G") + Environment.NewLine + "\t - Generating the DXDIAG Report" +
+                              Environment.NewLine);
             using (Process driverListQuery = new Process())
             {
                 if (File.Exists(Environment.SystemDirectory + @"\dxdiag.exe"))
@@ -752,8 +754,9 @@ namespace BSODInspector
                 string quote = Quotes();
                 if (quote != "0")
                 {
-                    greetings.WriteLine("\nDo You Know?" + Environment.NewLine + quote);
-                    Console.WriteLine(Environment.NewLine+"Do You Know?" + Environment.NewLine + quote);
+                    greetings.WriteLine(Environment.NewLine + "Do You Know?" + Environment.NewLine + quote);
+                    Console.WriteLine(Environment.NewLine + "Do You Know?" + Environment.NewLine + quote +
+                                      Environment.NewLine);
                 }
                 else
                 {
@@ -770,7 +773,7 @@ namespace BSODInspector
 
             while (msinfoThread.IsAlive)
             {
-                Console.WriteLine(DateTime.Now.ToString("G") +
+                Console.WriteLine(DateTime.Now.ToString("G") + Environment.NewLine +
                                   "\t - Processing MSINFO32 Report. Kindly do not close app...\n");
                 Thread.Sleep(8000);
             }
@@ -790,7 +793,8 @@ namespace BSODInspector
             {
                 if (File.Exists(Environment.SystemDirectory + @"\msinfo32.exe"))
                 {
-                    Console.WriteLine(Environment.NewLine + Environment.NewLine + DateTime.Now.ToString("G") + "\t - Generating MSINFO32 Report");
+                    Console.WriteLine(Environment.NewLine + Environment.NewLine + DateTime.Now.ToString("G") +
+                                      "\t - Generating MSINFO32 Report" + Environment.NewLine);
                     msinfoNfoReport.StartInfo.FileName = Environment.SystemDirectory + @"\msinfo32.exe";
                     msinfoNfoReport.StartInfo.Arguments = @"/nfo " + "\"" + tempDirectory + @"\MSINFO32.NFO" + "\"";
                     msinfoNfoReport.Start();

@@ -184,6 +184,27 @@ namespace BSODInspector
             }
 
             // ==================================================================================
+
+            // =================================================================================
+            Console.WriteLine(DateTime.Now.ToString("G") + "\t - Generating Application Event Log\n\n");
+            using (Process eventviewerProcess = new Process())
+            {
+                if (File.Exists(Environment.SystemDirectory + @"\wevtutil.exe"))
+                {
+                    eventviewerProcess.StartInfo.FileName = Environment.SystemDirectory + @"\wevtutil.exe";
+                    eventviewerProcess.StartInfo.Arguments = "epl " + "Application " + "\"" + tempDirectory +
+                                                             @"\ApplicationEventLog.evtx" + "\"";
+                    eventviewerProcess.Start();
+                    eventviewerProcess.WaitForExit();
+                    eventviewerProcess.Close();
+                }
+                else
+                {
+                    Console.WriteLine("Wevtutil.exe not found in system");
+                }
+            }
+
+            // ==================================================================================
             if (File.Exists(Environment.SystemDirectory + @"\drivers\etc\hosts"))
                 File.Copy(Environment.SystemDirectory + @"\drivers\etc\hosts", tempDirectory + @"\hosts.txt", true);
             Console.WriteLine(DateTime.Now.ToString("G") + "\t - Processing the HOSTS file\n\n");

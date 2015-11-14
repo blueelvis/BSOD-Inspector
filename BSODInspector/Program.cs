@@ -20,6 +20,10 @@ namespace BSODInspector
         private static extern bool FlashWindow(IntPtr hwnd, bool bInvert);
         //##    END
 
+
+        /// <summary>
+        /// Main Program
+        /// </summary>
         private static void Main()
         {
             Console.WriteLine("####################################");
@@ -34,15 +38,15 @@ namespace BSODInspector
                     .Replace("\\", "_")
                     .Replace(":", "_")
                     .Replace("-", "_")
-                    .Replace("/", "_");
+                    .Replace("/", "_");                     // Example = DESKTOP_1ITND9M_14_11_2015_23_31_35.zip
             string tempDirectory = Path.GetTempPath() + @"blueelvis";
             string systemDrive = Path.GetPathRoot(Environment.SystemDirectory);
             string applicationVersion = "1.0.4";
 
-            ComputerInfo sysinfo = new ComputerInfo();
+            ComputerInfo sysinfo = new ComputerInfo();      //References Microsoft.VisualBasic.Devices
 
-
-            if (Directory.Exists(tempDirectory))
+            
+            if (Directory.Exists(tempDirectory))            //Check for Directory and access rights
             {
                 DirectoryInfo dInfo = new DirectoryInfo(tempDirectory);
                 DirectorySecurity dSecurity = dInfo.GetAccessControl();
@@ -73,15 +77,15 @@ namespace BSODInspector
 
             // =======================================================================================
 
-            Thread msinfoThread = new Thread(MsinfoReportThread);
+            Thread msinfoThread = new Thread(MsinfoReportThread);               //Start MSINFO Thread.
             msinfoThread.Start();
             Console.WriteLine(DateTime.Now.ToString("G") + "\t - Started Collecting the MSINFO32 Report \n\n");
 
 
             // =======================================================================================
 
-            Console.WriteLine(DateTime.Now.ToString("G") + "\t - Copying Dump files if any\n\n");
-            if (Directory.Exists(systemDrive + @"Windows\Minidump\"))
+            Console.WriteLine(DateTime.Now.ToString("G") + "\t - Copying Dump files if any\n\n");   //Copy Dump files in case 
+            if (Directory.Exists(systemDrive + @"Windows\Minidump\"))                               //they exist
                 foreach (var file in Directory.GetFiles(systemDrive + @"Windows\Minidump\"))
                 {
                     if (file != null)
@@ -205,9 +209,11 @@ namespace BSODInspector
             }
 
             // ==================================================================================
+
             if (File.Exists(Environment.SystemDirectory + @"\drivers\etc\hosts"))
                 File.Copy(Environment.SystemDirectory + @"\drivers\etc\hosts", tempDirectory + @"\hosts.txt", true);
             Console.WriteLine(DateTime.Now.ToString("G") + "\t - Processing the HOSTS file\n\n");
+            
             // ==================================================================================
             Console.Write(DateTime.Now.ToString("G") +
                           "\t - Generating detailed list of installed Windows Updates\n\n");
@@ -405,15 +411,17 @@ namespace BSODInspector
             }
 
             // =================================================================================
+
             Console.WriteLine(DateTime.Now.ToString("G") + "\t - Collecting Miscellaneous Data\n\n");
-            RegistryKey werSvcKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\WerSVC");
+
+            RegistryKey werSvcKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\WerSVC");  //Check if Windows Error Reporting Service Is Running Or Not
             string werStatus = (werSvcKey != null)
                 ? Convert.ToString(werSvcKey.GetValue("Start"))
                 : "werSVCKey Not Found";
 
             // ================================================================================
 
-            RegistryKey kmsService =
+            RegistryKey kmsService =                                                //Check if Windows installation is Legit or not
                 Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\Service KMSELDI");
             var kmsStatus = (kmsService == null) ? 0 : 1;
 
@@ -421,7 +429,7 @@ namespace BSODInspector
 
             // ================================================================================
 
-            RegistryKey dumpType =
+            RegistryKey dumpType =                                                  //Check the type of Dump the system is configured to generate
                 Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\CrashControl");
             string dumpTypeString = "";
             if (dumpType!=null)
@@ -465,7 +473,7 @@ namespace BSODInspector
 
             // ================================================================================
 
-            string bootUpState = "", pagefilemanagement = "";
+            string bootUpState = "", pagefilemanagement = "";                       //Process WMI Commands
             using (Process wmic = new Process())
             {
                 if (File.Exists(Environment.SystemDirectory + @"\wbem\wmic.exe"))
@@ -519,6 +527,7 @@ namespace BSODInspector
                 }
             }
 
+            //Process the exported uninstall registry and filter out values and compile a single list
             using (
                 StreamReader uninstallcombinedListReader = new StreamReader(tempDirectory + @"\uninstall-reg.txt"))
             {
@@ -563,7 +572,7 @@ namespace BSODInspector
 
             }
 
-            string infile = tempDirectory + @"\duplicatesimpleUninstall.txt";
+            string infile = tempDirectory + @"\duplicatesimpleUninstall.txt";           //Logic to merge x86 & x64 Uninstall Lists
             string outfile = tempDirectory + @"\simpleuninstall.txt";
             var contents = File.ReadAllLines(infile);
             Array.Sort(contents);
@@ -588,6 +597,7 @@ namespace BSODInspector
                 }
             }
 
+
             string osInstallDate = "",
                 systemManufacturer = "",
                 systemModel = "",
@@ -597,7 +607,7 @@ namespace BSODInspector
             int hotfixInstalled = 0;
 
 
-            using (Process wmic = new Process())
+            using (Process wmic = new Process())                                    //More WMI Processing. Need to merge this
             {
                 if (File.Exists(Environment.SystemDirectory + @"\wbem\wmic.exe"))
                 {
@@ -653,7 +663,7 @@ namespace BSODInspector
                 }
             }
 
-            using (StreamReader systeminfoReader = new StreamReader(tempDirectory + @"\systeminfo.txt"))
+            using (StreamReader systeminfoReader = new StreamReader(tempDirectory + @"\systeminfo.txt"))        //Filter out the email address from the report for privacy concerns
             {
                 using (StreamWriter goodsysinfoWriter = new StreamWriter(tempDirectory + @"\goodsysteminfo.txt"))
                 {
@@ -670,7 +680,7 @@ namespace BSODInspector
                 }
             }
 
-            using (StreamReader hotFixReader = new StreamReader(tempDirectory + @"\InstalledWindowsUpdates.txt"))
+            using (StreamReader hotFixReader = new StreamReader(tempDirectory + @"\InstalledWindowsUpdates.txt"))       //Check the number of Windows Updates installed on a system
             {
                 while (hotFixReader.Peek() >= 0)
                 {
@@ -681,8 +691,8 @@ namespace BSODInspector
                 }
             }
             /////////////////////////////////////////////////////////////////////////////
-            //          BSOD Inspector Log                                             //
-            ////////////////////////////////////////////////////////////////////////////
+            //          BSOD Inspector Log Writer                                     //
+            ///////////////////////////////////////////////////////////////////////////
             Console.WriteLine(DateTime.Now.ToString("G") + "\t - Generating Inspector Log File\n\n");
             using (StreamWriter bsodInspectorWriter = new StreamWriter(tempDirectory + @"\BSODInspector.txt"))
             {
@@ -709,7 +719,7 @@ namespace BSODInspector
                 ManagementObjectSearcher avSearcher = new ManagementObjectSearcher(antiviruswmipath,
                     antivirusObjectQuery.QueryString);
                 ManagementObjectCollection avcollection = avSearcher.Get();
-                foreach (var o in avcollection)
+                foreach (var o in avcollection)                 //Get the list of Antivirus solutions installed on a system
                 {
                     if (o != null)
                     {
@@ -751,7 +761,7 @@ namespace BSODInspector
                 bsodInspectorWriter.Write(Environment.NewLine + Environment.NewLine + "###  DUMP FILE LIST ###" +
                                             Environment.NewLine + Environment.NewLine);
 
-                if (Directory.Exists(systemDrive + @"Windows\Minidump"))
+                if (Directory.Exists(systemDrive + @"Windows\Minidump"))                //Write the list of Minidumps & their Date Of Creation
                     foreach (var file in Directory.GetFiles(systemDrive + @"Windows\Minidump"))
                     {
                         if (file != null)
@@ -763,7 +773,7 @@ namespace BSODInspector
                         }
                     }
                 bsodInspectorWriter.WriteLine(Environment.NewLine);
-                if (File.Exists(systemDrive + @"Windows\Memory.DMP"))
+                if (File.Exists(systemDrive + @"Windows\Memory.DMP"))                   //Check whether a Memory.DMP exists or not
                 {
                     FileInfo memoryDump = new FileInfo(systemDrive + @"Windows\Memory.DMP");
                     bsodInspectorWriter.WriteLine("->MEMORY.DMP Found");
@@ -778,7 +788,7 @@ namespace BSODInspector
 
                 string systemRestorewmipath = @"\\" + Environment.MachineName + @"\root\default";
 
-                ObjectQuery sysRestoreObjectQuery = new ObjectQuery("SELECT * from SystemRestore");
+                ObjectQuery sysRestoreObjectQuery = new ObjectQuery("SELECT * from SystemRestore");     //Get list of System Restore Points
 
                 ManagementObjectSearcher srSearcher = new ManagementObjectSearcher(systemRestorewmipath,
                     sysRestoreObjectQuery.QueryString);
@@ -814,7 +824,7 @@ namespace BSODInspector
                                             "~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~");
             }
 
-            Console.WriteLine(DateTime.Now.ToString("G") + "\t - Removing Temporary Files\n\n");
+            Console.WriteLine(DateTime.Now.ToString("G") + "\t - Removing Temporary Files\n\n");       
             File.Delete(tempDirectory + @"\duplicatesimpleuninstall.txt");
             File.Delete(infile);
             File.Delete(outfile);
@@ -852,7 +862,7 @@ namespace BSODInspector
 
             }
 
-            while (msinfoThread.IsAlive)
+            while (msinfoThread.IsAlive)                //If the MSINFO thread is still alive, keep waiting. It takes some time.
             {
                 Console.WriteLine(DateTime.Now.ToString("G") + Environment.NewLine +
                                   "\t - Processing MSINFO32 Report. Kindly do not close app...\n");
@@ -864,14 +874,16 @@ namespace BSODInspector
                 CompressionLevel.Optimal, false);
             var greetingsProcess = Process.Start(tempDirectory + @"\greetings.txt");
             Thread.Sleep(1000);
-            if (greetingsProcess!=null)
+            if (greetingsProcess!=null)                                 //Flash the taskbar icon of Notepad in case user has lost focus
             {
                 FlashWindow(greetingsProcess.MainWindowHandle, false);
             }
         }
 
 
-
+        /// <summary>
+        /// Separate thread to collect the MSINFO32 Report.
+        /// </summary>
         static void MsinfoReportThread()
         {
             string tempDirectory = Path.GetTempPath() + @"blueelvis";
@@ -894,6 +906,11 @@ namespace BSODInspector
             }
         }
 
+        /// <summary>
+        /// Function to query and return a quote from the blog.
+        /// </summary>
+        /// <returns>Returns 0 on error and a "STRING" on success.</returns>
+
        static string Quotes()
         {
             WebClient quoteWebClient = new WebClient();
@@ -907,6 +924,12 @@ namespace BSODInspector
                 return "0";
             }
         }
+
+        /// <summary>
+        /// Converts the Date & Time which is generated by several WMI commands into human readable form
+        /// </summary>
+        /// <param name="stringDateToConvert">String parameter which contains the date & time outputted by several WMI Commands</param>
+        /// <returns>Returns a string containing the date & time</returns>
         static string ConvertDateTime(string stringDateToConvert)
         {
             stringDateToConvert = stringDateToConvert.Replace("\r", "").Replace("\n", "");
@@ -920,7 +943,5 @@ namespace BSODInspector
 
             return output;
         }
-
-
     }
 }

@@ -419,6 +419,52 @@ namespace BSODInspector
 
             // ================================================================================
 
+            // ================================================================================
+
+            RegistryKey dumpType =
+                Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\CrashControl");
+            string dumpTypeString = "";
+            if (dumpType!=null)
+            {
+                int dumpTypeValue = Convert.ToInt32(dumpType.GetValue("CrashDumpEnabled"));
+                switch (dumpTypeValue)
+                {
+                    case 0:
+                    {
+                        dumpTypeString = "System Is NOT Configured to generate dump files";
+                        break;
+                    }
+                    case 3:
+                        {
+                            dumpTypeString = "Small Memory Dump (256KB)";
+                            break;
+                        }
+                    case 2:
+                        {
+                            dumpTypeString = "Kernel Memory Dump";
+                            break;
+                        }
+                    case 1:
+                        {
+                            dumpTypeString = "Complete Memory Dump or Active Memory Dump";
+                            break;
+                        }
+                    case 7:
+                        {
+                            dumpTypeString = "Automatic Memory Dump";
+                            break;
+                        }
+                    default:
+                        {
+                            dumpTypeString = "Couldn't calculate Dump Type from Registry";
+                            break;
+                        }
+                }
+            }
+            
+
+            // ================================================================================
+
             string bootUpState = "", pagefilemanagement = "";
             using (Process wmic = new Process())
             {
@@ -650,6 +696,7 @@ namespace BSODInspector
                 bsodInspectorWriter.WriteLine("OS :               " + sysinfo.OSFullName);
                 bsodInspectorWriter.WriteLine("Boot Mode :        " + bootUpState);
                 bsodInspectorWriter.WriteLine("OS Install Date :  " + osInstallDate);
+                bsodInspectorWriter.WriteLine("Dump Type :        " + dumpTypeString);
                 bsodInspectorWriter.Write(Environment.NewLine +
                                             "========================================================" +
                                             Environment.NewLine + Environment.NewLine);

@@ -37,7 +37,7 @@ namespace BSODInspector
                     .Replace("/", "_");
             string tempDirectory = Path.GetTempPath() + @"blueelvis";
             string systemDrive = Path.GetPathRoot(Environment.SystemDirectory);
-            string applicationVersion = "1.0.3";
+            string applicationVersion = "1.0.4";
 
             ComputerInfo sysinfo = new ComputerInfo();
 
@@ -691,7 +691,7 @@ namespace BSODInspector
                 bsodInspectorWriter.Write(
                     "========================================================" + Environment.NewLine +
                     "############" + Environment.NewLine + "BSOD Inspector by blueelvis" + Environment.NewLine +
-                    "Special Thanks - John D. Carrona (Microsoft MVP)" + Environment.NewLine);
+                    "Special Thanks - John D. Carrona (Microsoft MVP)" + Environment.NewLine + Environment.NewLine);
                 bsodInspectorWriter.WriteLine("Version :          " + applicationVersion);
                 bsodInspectorWriter.WriteLine("OS :               " + sysinfo.OSFullName);
                 bsodInspectorWriter.WriteLine("Boot Mode :        " + bootUpState);

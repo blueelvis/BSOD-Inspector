@@ -710,19 +710,19 @@ namespace BSODInspector
                         if (file != null)
                         {
                             bsodInspectorWriter.Write(Environment.NewLine);
-                            bsodInspectorWriter.Write(file + "\t");
+                            bsodInspectorWriter.Write(file + "\t\t");
                             bsodInspectorWriter.Write(File.GetCreationTimeUtc(file));
 
                         }
                     }
-                bsodInspectorWriter.WriteLine("");
+                bsodInspectorWriter.WriteLine(Environment.NewLine);
                 if (File.Exists(systemDrive + @"Windows\Memory.DMP"))
                 {
                     FileInfo memoryDump = new FileInfo(systemDrive + @"Windows\Memory.DMP");
                     bsodInspectorWriter.WriteLine("->MEMORY.DMP Found");
                     bsodInspectorWriter.WriteLine("Size = " + memoryDump.Length / (1024 * 1024) + " MB");
                     bsodInspectorWriter.WriteLine("Date Of Creation = " +
-                                                  File.GetCreationTimeUtc(systemDrive + @"Windows\Memory.DMP"));
+                                                  "\t\t" + File.GetCreationTimeUtc(systemDrive + @"Windows\Memory.DMP"));
                 }
                 else
                 {

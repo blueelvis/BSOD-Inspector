@@ -638,22 +638,22 @@ namespace BSODInspector
             //          BSOD Inspector Log                                             //
             ////////////////////////////////////////////////////////////////////////////
             Console.WriteLine(DateTime.Now.ToString("G") + "\t - Generating Inspector Log File\n\n");
-            using (StreamWriter bsodInspectorwrWriter = new StreamWriter(tempDirectory + @"\BSODInspector.txt"))
+            using (StreamWriter bsodInspectorWriter = new StreamWriter(tempDirectory + @"\BSODInspector.txt"))
             {
 
 
-                bsodInspectorwrWriter.Write(
+                bsodInspectorWriter.Write(
                     "========================================================" + Environment.NewLine +
                     "############" + Environment.NewLine + "BSOD Inspector by blueelvis" + Environment.NewLine +
                     "Special Thanks - John D. Carrona (Microsoft MVP)" + Environment.NewLine);
-                bsodInspectorwrWriter.WriteLine("Version :          " + applicationVersion);
-                bsodInspectorwrWriter.WriteLine("OS :               " + sysinfo.OSFullName);
-                bsodInspectorwrWriter.WriteLine("Boot Mode :        " + bootUpState);
-                bsodInspectorwrWriter.WriteLine("OS Install Date :  " + osInstallDate);
-                bsodInspectorwrWriter.Write(Environment.NewLine +
+                bsodInspectorWriter.WriteLine("Version :          " + applicationVersion);
+                bsodInspectorWriter.WriteLine("OS :               " + sysinfo.OSFullName);
+                bsodInspectorWriter.WriteLine("Boot Mode :        " + bootUpState);
+                bsodInspectorWriter.WriteLine("OS Install Date :  " + osInstallDate);
+                bsodInspectorWriter.Write(Environment.NewLine +
                                             "========================================================" +
                                             Environment.NewLine + Environment.NewLine);
-                bsodInspectorwrWriter.Write("### SYSTEM INFO  ###" + Environment.NewLine);
+                bsodInspectorWriter.Write("### SYSTEM INFO  ###" + Environment.NewLine);
 
                 string antiviruswmipath = @"\\" + Environment.MachineName + @"\root\SecurityCenter2";
                 string antivirusList = String.Empty;
@@ -679,47 +679,54 @@ namespace BSODInspector
                     antivirusList = "No Antivirus Found";
                 else
                     antivirusList.Remove(antivirusList.Length - 1);
-                bsodInspectorwrWriter.WriteLine("Antivirus = " + antivirusList);
-                bsodInspectorwrWriter.WriteLine(kmsStatus == 0 ? "Activation = KMS NOT FOUND" : "Activation = Not Genuine");
+                bsodInspectorWriter.WriteLine("Antivirus = " + antivirusList);
+                bsodInspectorWriter.WriteLine(kmsStatus == 0 ? "Activation = KMS NOT FOUND" : "Activation = Not Genuine");
 
-                bsodInspectorwrWriter.WriteLine("Windows Updates = " + hotfixInstalled.ToString() + " Updates Installed");
-                bsodInspectorwrWriter.WriteLine("Manufacturer = " + systemManufacturer);
-                bsodInspectorwrWriter.WriteLine("Model = " + systemModel);
-                bsodInspectorwrWriter.WriteLine("BIOS = " + biosVersion);
-                bsodInspectorwrWriter.Write(Environment.NewLine + Environment.NewLine +
+                bsodInspectorWriter.WriteLine("Windows Updates = " + hotfixInstalled.ToString() + " Updates Installed");
+                bsodInspectorWriter.WriteLine("Manufacturer = " + systemManufacturer);
+                bsodInspectorWriter.WriteLine("Model = " + systemModel);
+                bsodInspectorWriter.WriteLine("BIOS = " + biosVersion);
+                bsodInspectorWriter.Write(Environment.NewLine + Environment.NewLine +
                                             "###  Dump Generation Settings  ###" + Environment.NewLine);
-                bsodInspectorwrWriter.WriteLine(File.Exists(systemDrive + @"\pagefile.sys")
+                bsodInspectorWriter.WriteLine(File.Exists(systemDrive + @"\pagefile.sys")
                     ? "Pagefile Location = Found on OS drive!"
                     : "Pagefile Location = Pagefile Not Found on OS Drive!");
 
-                bsodInspectorwrWriter.WriteLine("Pagefile Size = " + pageFileSize);
+                bsodInspectorWriter.WriteLine("Pagefile Size = " + pageFileSize);
 
-                bsodInspectorwrWriter.WriteLine(pagefilemanagement.Contains("TRUE")
+                bsodInspectorWriter.WriteLine(pagefilemanagement.Contains("TRUE")
                     ? "Pagefile Managed by System = TRUE"
                     : "Pagefile Managed by System = FALSE");
 
-                bsodInspectorwrWriter.WriteLine(werStatus == "3"
+                bsodInspectorWriter.WriteLine(werStatus == "3"
                     ? "WER Service Status = Set to Manual"
                     : "WER Service Status = Not Manual!");
-                bsodInspectorwrWriter.Write(Environment.NewLine + Environment.NewLine + "###  DUMP FILE LIST ###" +
+                bsodInspectorWriter.Write(Environment.NewLine + Environment.NewLine + "###  DUMP FILE LIST ###" +
                                             Environment.NewLine + Environment.NewLine);
 
                 if (Directory.Exists(systemDrive + @"Windows\Minidump"))
                     foreach (var file in Directory.GetFiles(systemDrive + @"Windows\Minidump"))
                     {
                         if (file != null)
-                            bsodInspectorwrWriter.WriteLine(file);
+                        {
+                            bsodInspectorWriter.Write(Environment.NewLine);
+                            bsodInspectorWriter.Write(file + "\t");
+                            bsodInspectorWriter.Write(File.GetCreationTimeUtc(file));
+
+                        }
                     }
-                bsodInspectorwrWriter.WriteLine("");
+                bsodInspectorWriter.WriteLine("");
                 if (File.Exists(systemDrive + @"Windows\Memory.DMP"))
                 {
                     FileInfo memoryDump = new FileInfo(systemDrive + @"Windows\Memory.DMP");
-                    bsodInspectorwrWriter.WriteLine("->MEMORY.DMP Found");
-                    bsodInspectorwrWriter.WriteLine("Size = " + memoryDump.Length / (1024 * 1024) + " MB");
+                    bsodInspectorWriter.WriteLine("->MEMORY.DMP Found");
+                    bsodInspectorWriter.WriteLine("Size = " + memoryDump.Length / (1024 * 1024) + " MB");
+                    bsodInspectorWriter.WriteLine("Date Of Creation = " +
+                                                  File.GetCreationTimeUtc(systemDrive + @"Windows\Memory.DMP"));
                 }
                 else
                 {
-                    bsodInspectorwrWriter.WriteLine("MEMORY.DMP not found");
+                    bsodInspectorWriter.WriteLine("MEMORY.DMP not found");
                 }
 
                 string systemRestorewmipath = @"\\" + Environment.MachineName + @"\root\default";
@@ -731,7 +738,7 @@ namespace BSODInspector
 
                 ManagementObjectCollection srcollection = srSearcher.Get();
 
-                bsodInspectorwrWriter.Write(Environment.NewLine + Environment.NewLine +
+                bsodInspectorWriter.Write(Environment.NewLine + Environment.NewLine +
                                             "###  RECOVERY POINTS PRESENT  ###" + Environment.NewLine +
                                             "Description \t\t\t\t Date Of Creation" + Environment.NewLine);
                 foreach (var o in srcollection)
@@ -740,23 +747,23 @@ namespace BSODInspector
                     if (sr == null) continue;
 
                     if (sr["Description"].ToString().Contains("Windows Update"))
-                        bsodInspectorwrWriter.Write(sr["Description"] + "\t\t\t\t");
+                        bsodInspectorWriter.Write(sr["Description"] + "\t\t\t\t");
                     else
-                        bsodInspectorwrWriter.Write(sr["Description"] + "\t\t\t");
+                        bsodInspectorWriter.Write(sr["Description"] + "\t\t\t");
                     var creationTime = sr["CreationTime"].ToString();
                     creationTime = ConvertDateTime(creationTime);
-                    bsodInspectorwrWriter.Write(creationTime + Environment.NewLine);
+                    bsodInspectorWriter.Write(creationTime + Environment.NewLine);
                 }
                 if (srcollection.Count == 0)
-                    bsodInspectorwrWriter.Write(Environment.NewLine + "No Recovery Points Found" +
+                    bsodInspectorWriter.Write(Environment.NewLine + "No Recovery Points Found" +
                                                 Environment.NewLine);
-                bsodInspectorwrWriter.WriteLine(Environment.NewLine + Environment.NewLine + "###  MEMORY INFO  ###");
-                bsodInspectorwrWriter.WriteLine("Total RAM = " + sysinfo.TotalPhysicalMemory / (1024 * 1024) + " MB");
-                bsodInspectorwrWriter.WriteLine("Available RAM = " + sysinfo.AvailablePhysicalMemory / (1024 * 1024) +
+                bsodInspectorWriter.WriteLine(Environment.NewLine + Environment.NewLine + "###  MEMORY INFO  ###");
+                bsodInspectorWriter.WriteLine("Total RAM = " + sysinfo.TotalPhysicalMemory / (1024 * 1024) + " MB");
+                bsodInspectorWriter.WriteLine("Available RAM = " + sysinfo.AvailablePhysicalMemory / (1024 * 1024) +
                                                 " MB");
-                bsodInspectorwrWriter.WriteLine("PageFile Location = "+pageFileLocation);
-                bsodInspectorwrWriter.WriteLine("Pagefile Size = " + pageFileSize);
-                bsodInspectorwrWriter.Write(Environment.NewLine + Environment.NewLine +
+                bsodInspectorWriter.WriteLine("PageFile Location = "+pageFileLocation);
+                bsodInspectorWriter.WriteLine("Pagefile Size = " + pageFileSize);
+                bsodInspectorWriter.Write(Environment.NewLine + Environment.NewLine +
                                             "~~~~~~~~~~~~~~~~~~~~~~~~~~~EOF~~~~~~~~~~~~~~~~~~~~~~~~~");
             }
 

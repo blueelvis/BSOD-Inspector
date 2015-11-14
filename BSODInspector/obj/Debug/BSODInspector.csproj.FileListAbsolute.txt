@@ -4,3 +4,9 @@ C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2013\Projects\BSODInspector\BSO
 C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2013\Projects\BSODInspector\BSODInspector\obj\Debug\BSODInspector.csprojResolveAssemblyReference.cache
 C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2013\Projects\BSODInspector\BSODInspector\obj\Debug\BSODInspector.exe
 C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2013\Projects\BSODInspector\BSODInspector\obj\Debug\BSODInspector.pdb
+C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2015\Projects\BSODInspector\BSODInspector\bin\Debug\BSODInspector.exe.config
+C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2015\Projects\BSODInspector\BSODInspector\bin\Debug\BSODInspector.exe
+C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2015\Projects\BSODInspector\BSODInspector\bin\Debug\BSODInspector.pdb
+C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2015\Projects\BSODInspector\BSODInspector\obj\Debug\BSODInspector.csprojResolveAssemblyReference.cache
+C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2015\Projects\BSODInspector\BSODInspector\obj\Debug\BSODInspector.exe
+C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2015\Projects\BSODInspector\BSODInspector\obj\Debug\BSODInspector.pdb

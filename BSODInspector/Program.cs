@@ -9,11 +9,17 @@ using System.Net;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading;
+using System.Runtime.InteropServices;
 
 namespace BSODInspector
 {
     internal class Program
     {
+        //##    Methods for Flashing the Taskbar window of the inactive process
+        [DllImport("user32.dll")]
+        private static extern bool FlashWindow(IntPtr hwnd, bool bInvert);
+        //##    END
+
         private static void Main()
         {
             Console.WriteLine("####################################");
@@ -618,7 +624,7 @@ namespace BSODInspector
                 bsodInspectorwrWriter.Write(
                     "========================================================" + Environment.NewLine +
                     "############" + Environment.NewLine + "BSOD Inspector by blueelvis" + Environment.NewLine +
-                    "Special Thanks - John D. Carrona (Microsoft MVP)");
+                    "Special Thanks - John D. Carrona (Microsoft MVP)" + Environment.NewLine);
                 bsodInspectorwrWriter.WriteLine("Version :          " + applicationVersion);
                 bsodInspectorwrWriter.WriteLine("OS :               " + sysinfo.OSFullName);
                 bsodInspectorwrWriter.WriteLine("Boot Mode :        " + bootUpState);
@@ -781,7 +787,12 @@ namespace BSODInspector
             ZipFile.CreateFromDirectory(tempDirectory,
                 Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + @"\" + zipFileName,
                 CompressionLevel.Optimal, false);
-            Process.Start(tempDirectory + @"\greetings.txt");
+            var greetingsProcess = Process.Start(tempDirectory + @"\greetings.txt");
+            Thread.Sleep(1000);
+            if (greetingsProcess!=null)
+            {
+                FlashWindow(greetingsProcess.MainWindowHandle, false);
+            }
         }
 
 
@@ -808,7 +819,7 @@ namespace BSODInspector
             }
         }
 
-        static string Quotes()
+       static string Quotes()
         {
             WebClient quoteWebClient = new WebClient();
             try

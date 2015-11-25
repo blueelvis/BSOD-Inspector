@@ -10,3 +10,6 @@ C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2015\Projects\BSODInspector\BSO
 C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2015\Projects\BSODInspector\BSODInspector\obj\Debug\BSODInspector.csprojResolveAssemblyReference.cache
 C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2015\Projects\BSODInspector\BSODInspector\obj\Debug\BSODInspector.exe
 C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2015\Projects\BSODInspector\BSODInspector\obj\Debug\BSODInspector.pdb
+C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2015\Projects\BSODInspector\BSODInspector\obj\Debug\Interop.Shell32.dll
+C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2015\Projects\BSODInspector\BSODInspector\obj\Debug\BSODInspector.csproj.ResolveComReference.cache
+C:\Users\Blueelvis_RoXXX\Documents\Visual Studio 2015\Projects\BSODInspector\BSODInspector\bin\Debug\Interop.Shell32.dll

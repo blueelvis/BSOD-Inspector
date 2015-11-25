@@ -4,7 +4,6 @@ using System.IO;
 using Microsoft.VisualBasic.Devices;
 using Microsoft.Win32;
 using System.Management;
-using System.IO.Compression;
 using System.Net;
 using System.Security.AccessControl;
 using System.Security.Principal;
@@ -42,7 +41,7 @@ namespace BSODInspector
             string tempDirectory = Path.GetTempPath() + @"blueelvis";
             string systemDrive = Path.GetPathRoot(Environment.SystemDirectory);
             string applicationVersion = "1.0.4";
-
+            bool is64BitOperatingSystem=false;
             ComputerInfo sysinfo = new ComputerInfo();      //References Microsoft.VisualBasic.Devices
 
             
@@ -94,6 +93,30 @@ namespace BSODInspector
 
             // ======================================================================================
 
+            // ====================================================================================
+            Console.WriteLine(DateTime.Now.ToString("G") + "\t - Generating SystemInfo\n\n");
+            using (StreamWriter fileWriter = new StreamWriter(tempDirectory + @"\systeminfo.txt"))
+            {
+                using (Process systeminfo = new Process())
+                {
+                    if (File.Exists(Environment.SystemDirectory + @"\systeminfo.exe"))
+                    {
+                        systeminfo.StartInfo.FileName = Environment.SystemDirectory + @"\systeminfo.exe";
+                        systeminfo.StartInfo.RedirectStandardOutput = true;
+                        systeminfo.StartInfo.UseShellExecute = false;
+                        systeminfo.Start();
+                        fileWriter.WriteLine(systeminfo.StandardOutput.ReadToEnd());
+                        systeminfo.WaitForExit();
+                        fileWriter.Close();
+                        systeminfo.Close();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Systeminfo.exe not found in system");
+                    }
+                }
+
+            }
 
             // ======================================================================================
             Console.WriteLine(DateTime.Now.ToString("G") + "\t - Querying System for Drivers\n\n");
@@ -122,7 +145,33 @@ namespace BSODInspector
                 }
             }
 
+            // ======================================================================================
+            if (File.Exists(tempDirectory + @"\systeminfo.txt"))
+            {
+                using (StreamReader systeminfoReader = new StreamReader(tempDirectory + @"\systeminfo.txt"))
+                    //Filter out the email address from the report for privacy concerns
+                {
+                    using (StreamWriter goodsysinfoWriter = new StreamWriter(tempDirectory + @"\goodsysteminfo.txt"))
+                    {
+                        int lineNumber = -1;
+                        while (systeminfoReader.Peek() >= 0)
+                        {
+                            string logFileContent = systeminfoReader.ReadLine();
+                            lineNumber++;
+                            if (lineNumber == 7)
+                                continue;
+                            if (lineNumber == 14)
+                                if (logFileContent.Contains("x64"))
+                                    is64BitOperatingSystem = true;
 
+                            goodsysinfoWriter.WriteLine(logFileContent);
+
+                        }
+                    }
+                }
+            }
+            else
+                Console.WriteLine("Cannot find SystemInfo.txt");
             // ======================================================================================
 
             using (StreamWriter fileWriter = new StreamWriter(tempDirectory + @"\driverlist.txt"))
@@ -241,33 +290,8 @@ namespace BSODInspector
 
             }
 
-            // ====================================================================================
-            Console.WriteLine(DateTime.Now.ToString("G") + "\t - Generating SystemInfo\n\n");
-            using (StreamWriter fileWriter = new StreamWriter(tempDirectory + @"\systeminfo.txt"))
-            {
-                using (Process systeminfo = new Process())
-                {
-                    if (File.Exists(Environment.SystemDirectory + @"\systeminfo.exe"))
-                    {
-                        systeminfo.StartInfo.FileName = Environment.SystemDirectory + @"\systeminfo.exe";
-                        systeminfo.StartInfo.RedirectStandardOutput = true;
-                        systeminfo.StartInfo.UseShellExecute = false;
-                        systeminfo.Start();
-                        fileWriter.WriteLine(systeminfo.StandardOutput.ReadToEnd());
-                        systeminfo.WaitForExit();
-                        fileWriter.Close();
-                        systeminfo.Close();
-                    }
-                    else
-                    {
-                        Console.WriteLine("Systeminfo.exe not found in system");
-                    }
-                }
-
-            }
-
             // ==================================================================================
-            if (Environment.Is64BitOperatingSystem)
+            if (is64BitOperatingSystem)
             {
                 Console.WriteLine(DateTime.Now.ToString("G") + "\t - Exporting x86 Uninstall Registry\n\n");
 
@@ -279,7 +303,7 @@ namespace BSODInspector
                         uninstallListx86.StartInfo.Arguments =
                             @"export HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\ " + "\"" +
                             tempDirectory +
-                            @"\uninstallx86.txt" + "\"";
+                            @"\uninstallx86.txt" + "\"" +" /reg:32";
                         uninstallListx86.Start();
                         uninstallListx86.WaitForExit();
                         uninstallListx86.Close();
@@ -380,7 +404,7 @@ namespace BSODInspector
                 {
                     if (File.Exists(systemDrive + @"\Windows\System32\reg.exe"))
                     {
-                        if (!Environment.Is64BitOperatingSystem)
+                        if (!is64BitOperatingSystem)
                         {
                             uninstallListx64.StartInfo.FileName = systemDrive + @"\Windows\System32\reg.exe";
                             uninstallListx64.StartInfo.Arguments =
@@ -390,7 +414,7 @@ namespace BSODInspector
                         }
                         else
                         {
-                            uninstallListx64.StartInfo.FileName = systemDrive + @"\Windows\Sysnative\reg.exe";
+                            uninstallListx64.StartInfo.FileName = systemDrive + @"\Windows\System32\reg.exe";
                             uninstallListx64.StartInfo.Arguments =
                                 @"export HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall " +
                                 "\"" + tempDirectory + "\"" +
@@ -406,6 +430,7 @@ namespace BSODInspector
                     {
                         Console.WriteLine("reg.exe not found in system");
                     }
+                    Console.WriteLine("HelloWorld");
                 }
 
             }
@@ -515,7 +540,7 @@ namespace BSODInspector
                 Console.WriteLine(DateTime.Now.ToString("G") +
                               "\t - Blank File for x64 Uninstall List Created\n\n");
             }
-            using (var output = File.Create(tempDirectory + @"\uninstall-reg.txt"))
+            /*using (var output = File.Create(tempDirectory + @"\uninstall-reg.txt"))
             {
                 foreach (
                     var file in new[] { tempDirectory + @"\uninstallx86.txt", tempDirectory + @"\uninstallx64.txt" })
@@ -525,7 +550,25 @@ namespace BSODInspector
                         input.CopyTo(output);
                     }
                 }
-            }
+                }*/
+                using (StreamReader uninstallx86Reader = new StreamReader(tempDirectory + @"\uninstallx86.txt"))
+                {
+                    using (StreamReader uninstallx64Reader = new StreamReader(tempDirectory + @"\uninstallx64.txt"))
+                    {
+                        using (StreamWriter uninstallRegWriter = new StreamWriter(tempDirectory + @"\uninstall-reg.txt"))
+                        {
+                            while (uninstallx86Reader.Peek() >= 0)
+                            {
+                                uninstallRegWriter.WriteLine(uninstallx86Reader.ReadLine());
+                            }
+                            while (uninstallx64Reader.Peek() >= 0)
+                            {
+                                uninstallRegWriter.WriteLine(uninstallx64Reader.ReadLine());
+                            }
+                        }
+                    }
+                }
+            
 
             //Process the exported uninstall registry and filter out values and compile a single list
             using (
@@ -660,23 +703,6 @@ namespace BSODInspector
                     pageFileSize = pageFileSize.Replace("\n", "").Replace("AllocatedBaseSize=", "");
                     pageFileSize += " MB";
 
-                }
-            }
-
-            using (StreamReader systeminfoReader = new StreamReader(tempDirectory + @"\systeminfo.txt"))        //Filter out the email address from the report for privacy concerns
-            {
-                using (StreamWriter goodsysinfoWriter = new StreamWriter(tempDirectory + @"\goodsysteminfo.txt"))
-                {
-                    int lineNumber = -1;
-                    while (systeminfoReader.Peek() >= 0)
-                    {
-                        string logFileContent = systeminfoReader.ReadLine();
-                        lineNumber++;
-                        if (lineNumber == 7)
-                            continue;
-                        goodsysinfoWriter.WriteLine(logFileContent);
-
-                    }
                 }
             }
 
@@ -869,9 +895,11 @@ namespace BSODInspector
                 Thread.Sleep(8000);
             }
             Console.WriteLine(DateTime.Now.ToString("G") + "\t - Zipping Up Files!");
-            ZipFile.CreateFromDirectory(tempDirectory,
-                Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + @"\" + zipFileName,
-                CompressionLevel.Optimal, false);
+            bool zipFileStatus = ZipFile(tempDirectory, zipFileName);
+            if (!zipFileStatus)
+            {
+                Console.WriteLine("There was an error while creating the ZIP file");
+            }
             var greetingsProcess = Process.Start(tempDirectory + @"\greetings.txt");
             Thread.Sleep(1000);
             if (greetingsProcess!=null)                                 //Flash the taskbar icon of Notepad in case user has lost focus
@@ -926,22 +954,69 @@ namespace BSODInspector
         }
 
         /// <summary>
+        /// Zip File mechanism using Shell32. Easiest way to do without any 3rd party API
+        /// </summary>
+        /// <param name="inputPath"></param>
+        /// <param name="zipFileName"></param>
+        /// <returns></returns>
+        private static bool ZipFile(string inputPath, string zipFileName)
+        {
+            byte[] emptyzip = new byte[]{80,75,5,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+            FileStream fs = File.Create(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + @"\" +
+                                        zipFileName);
+            fs.Write(emptyzip,0,emptyzip.Length);
+            fs.Flush();
+            fs.Close();
+            try
+            {
+                Shell32.Folder zipInput = GetShell32NameSpace(inputPath);
+                Shell32.Folder zipOutput =
+                    GetShell32NameSpace(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + @"\" +
+                                       zipFileName);
+                foreach (var file in zipInput.Items())
+                {
+                    if (file != null)
+                        zipOutput.CopyHere(file, 4 | 16);
+                    Thread.Sleep(1000);
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Converts the Date & Time which is generated by several WMI commands into human readable form
         /// </summary>
         /// <param name="stringDateToConvert">String parameter which contains the date & time outputted by several WMI Commands</param>
         /// <returns>Returns a string containing the date & time</returns>
-        static string ConvertDateTime(string stringDateToConvert)
+        private static string ConvertDateTime(string stringDateToConvert)
         {
             stringDateToConvert = stringDateToConvert.Replace("\r", "").Replace("\n", "");
             if (stringDateToConvert.Length > 8)
                 stringDateToConvert = stringDateToConvert.Remove(8);
 
             var temporaryArray = stringDateToConvert.ToCharArray();
-            var output = temporaryArray[0].ToString() + temporaryArray[1].ToString() + temporaryArray[2].ToString() + temporaryArray[3].ToString() + "-";
+            var output = temporaryArray[0].ToString() + temporaryArray[1].ToString() + temporaryArray[2].ToString() +
+                         temporaryArray[3].ToString() + "-";
             output += temporaryArray[4].ToString() + temporaryArray[5].ToString() + "-";
             output += temporaryArray[6].ToString() + temporaryArray[7].ToString();
 
             return output;
+        }
+
+        /// <summary>
+        /// Shell32 Code Since Shell32 changed in Windows 7. Read More over here - http://techitongue.blogspot.in/2012/06/shell32-code-compiled-on-windows-7.html
+        /// </summary>
+        /// <param name="folder"></param>
+        /// <returns></returns>
+        static public Shell32.Folder GetShell32NameSpace(Object folder)
+        {
+            Type shellAppType = Type.GetTypeFromProgID("Shell.Application");
+            var shell = Activator.CreateInstance(shellAppType);
+            return (Shell32.Folder)shellAppType.InvokeMember("NameSpace", System.Reflection.BindingFlags.InvokeMethod, null, shell, new[] { folder });
         }
     }
 }
